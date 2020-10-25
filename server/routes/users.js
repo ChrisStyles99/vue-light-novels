@@ -1,9 +1,9 @@
-const { genSalt } = require('bcryptjs');
 const {Router} = require('express');
 const router = Router();
 const dbConnection = require('../config/dbConnection');
 const connection = dbConnection();
 const bcrypt = require('bcryptjs');
+const passport = require('passport');
 
 router.post('/register', (req, res) => {
   connection.query('SELECT email FROM users WHERE email = ?', [req.body.email], async(error, results) => {
@@ -30,27 +30,18 @@ router.post('/register', (req, res) => {
   });
 });
 
-router.post('/login', async(req, res) => {
-  try {
-    const {email, password} = req.body;
-
-    connection.query('SELECT * FROM users WHERE email = ?', [email], async(error, result) => {
-
-      if(error) throw error;
-
-      if(result.length < 1) {
-        return res.json({error: true, msg: 'The email or the password is incorrect'});
-      }
-
-      if(!(await bcrypt.compare(password, result[0].password))) {
-        return res.json({error: true, msg: 'The email or the password is incorrect'});
-      }
-
-      res.json({msg: 'Welcome!'});
-    });
-  } catch (error) {
-    console.log(error);
-  }
+router.post('/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if(err) throw err;
+    if(!user) {
+      res.json({error: true, msg: 'Email or password is incorrect'});
+    } else {
+      req.logIn(user, err => {
+        if(err) throw err;
+        res.json({msg: 'Welcome'});
+      })
+    }
+  })(req, res, next);
 });
 
 router.get('/profile', (req, res) => {

@@ -15,8 +15,8 @@
 import AddForm from '@/components/AddForm.vue'
 import NovelCard from '@/components/NovelCard.vue'
 import { ref } from 'vue'
-import Axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
 export default {
   components: {
@@ -33,6 +33,7 @@ export default {
     const validImage = ref(true);
 
     const router = useRouter();
+    const store = useStore();
 
     const changeValue = e => {
       if(e.target.id === 'title') {
@@ -58,7 +59,9 @@ export default {
         return validImage.value = false;
       }
 
-      await Axios.post('http://localhost:3000/new-novel', novel.value);
+      await store.dispatch('postNewNovel', novel.value);
+
+      // await Axios.post('http://localhost:3000/new-novel', novel.value);
       router.push('/novels');
     };
 

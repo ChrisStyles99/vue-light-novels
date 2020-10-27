@@ -26,5 +26,18 @@ export default {
   font-family: 'Cabin', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  // .router-view::after {
+  //   content: '';
+  //   position: absolute;
+  //   right: 0;
+  //   bottom: 0;
+  //   z-index: -5;
+  //   background-color: #2b69db;
+  //   width: 100%;
+  //   height: 50%;
+  //   transform: skewY(-20deg);
+  //   overflow: hidden;
+  // }
 }
 </style>

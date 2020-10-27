@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
-const passportLocal = require('passport-local').Strategy;
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
@@ -13,16 +12,18 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 
+// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cors({
-  origin: 'http://localhost:8080',
-  credentials: true
+  credentials: true,
+  origin: 'http://localhost:8080'
 }));
 app.use(session({
   secret: process.env.SECRET,
-  resave: true,
-  saveUninitialized: true
+  resave: false,
+  saveUninitialized: false,
+  cookie: {maxAge: 3600000}
 }));
 app.use(cookieParser(process.env.SECRET));
 app.use(passport.initialize());

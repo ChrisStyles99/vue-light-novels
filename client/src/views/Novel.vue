@@ -16,11 +16,11 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
 import Error from '@/components/Error.vue';
 import Loading from '@/components/Loading.vue';
+import { useStore } from 'vuex';
 
 export default {
   components: {
@@ -31,12 +31,14 @@ export default {
     const {
       params: { id },
     } = useRoute();
-    const novel = ref({});
+    const store = useStore();
+    const novel = computed(() => {
+      return store.getters.singleNovel;
+    });
     const router = useRouter();
     const loading = ref(true);
     const error = ref(false);
-
-    console.log(id);
+    
 
     if(id === undefined) {
       return router.push('/add-novel');
@@ -47,9 +49,7 @@ export default {
         if(id === undefined) {
           return router.push('/add-novel');
         }
-        const res = await axios.get(`http://localhost:3000/novel/${id}`);
-        const data = res.data;
-        novel.value = data[0];
+        store.dispatch('getSingleNovel', id);
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -59,7 +59,7 @@ export default {
     });
 
     const deleteNovel = async(id) => {
-      await axios.delete(`http://localhost:3000/delete/${id}`);
+      store.dispatch('deleteNovel', id);
       router.push('/novels');
     }
 

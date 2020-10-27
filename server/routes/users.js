@@ -4,6 +4,7 @@ const dbConnection = require('../config/dbConnection');
 const connection = dbConnection();
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 router.post('/register', (req, res) => {
   connection.query('SELECT email FROM users WHERE email = ?', [req.body.email], async(error, results) => {
@@ -44,8 +45,18 @@ router.post('/login', (req, res, next) => {
   })(req, res, next);
 });
 
-router.get('/profile', (req, res) => {
-  res.send('Profile');
+router.get('/profile', authMiddleware, (req, res) => {
+  console.log(req.user.id);
+  res.json(req.user);
+});
+
+router.get('/logout', (req, res, next) => {
+  req.session.destroy((err) => {
+    if(err) return next(err);
+  });
+  res.clearCookie('connect.sid');
+  req.logout();
+  res.sendStatus(200);
 });
 
 module.exports = router;

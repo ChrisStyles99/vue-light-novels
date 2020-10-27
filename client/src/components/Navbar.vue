@@ -20,15 +20,31 @@
           >About</router-link
         >
       </li>
-      <li>
+      <li v-if="!isLoggedIn">
+        <router-link
+          class="nav-link"
+          :style="valid ? 'color: #fff;' : 'color: #000;'"
+          to="/register"
+          >Register</router-link
+        >
+      </li>
+      <li v-if="!isLoggedIn">
+        <router-link
+          class="nav-link"
+          :style="valid ? 'color: #fff;' : 'color: #000;'"
+          to="/login"
+          >Login</router-link
+        >
+      </li>
+      <li v-if="isLoggedIn">
         <router-link
           class="nav-link"
           :style="valid ? 'color: #fff;' : 'color: #000;'"
           to="/novels"
-          >All novels</router-link
+          >My novels</router-link
         >
       </li>
-      <li>
+      <li v-if="isLoggedIn">
         <router-link
           class="nav-link"
           :style="valid ? 'color: #fff;' : 'color: #000;'"
@@ -36,10 +52,15 @@
           >Search</router-link
         >
       </li>
-      <li>
+      <li v-if="isLoggedIn">
         <router-link class="nav-link add-novel" to="/add-novel"
           >Add novel</router-link
         >
+      </li>
+      <li v-if="isLoggedIn">
+        <button class="btn" @click="logout" :style="valid ? 'color: #fff;' : 'color: #000;'">
+          Logout
+        </button>
       </li>
     </ul>
     <div class="toggle-menu" @click="toggleMenu">
@@ -65,13 +86,18 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 export default {
   setup() {
     const router = useRouter();
     const valid = ref(null);
     const active = ref(false);
+    const store = useStore();
+    const isLoggedIn = computed(() => {
+      return store.getters.isLoggedIn;
+    });
 
     onMounted(() => {
       router.afterEach(() => {
@@ -80,6 +106,11 @@ export default {
       });
     });
 
+    const logout = async() => {
+      await store.dispatch('logoutUser');
+      router.push('/login');
+    };
+
     const toggleMenu = () => {
       active.value = !active.value
     }
@@ -87,7 +118,9 @@ export default {
     return {
       valid,
       active,
-      toggleMenu
+      toggleMenu,
+      logout,
+      isLoggedIn
     };
   },
 };
@@ -100,6 +133,7 @@ export default {
   align-items: center;
   height: 80px;
   transition: 0.3s ease all;
+  box-shadow: 2px 4px 8px rgba($color: #000000, $alpha: 0.2);
 
   .toggle-menu {
     display: none;
@@ -118,6 +152,7 @@ export default {
     list-style-type: none;
     li {
       margin: 0 10px;
+
       .nav-link {
         color: #000;
         text-decoration: none;
@@ -127,6 +162,18 @@ export default {
         &:hover {
           background-color: #3b72c5;
         }
+      }
+
+      .btn {
+        cursor: pointer;
+        padding: 0;
+        background: none;
+        font-size: 1.1rem;
+        border: none;
+      }
+
+      .nav-link.router-link-exact-active {
+        background-color: #3b72c5;
       }
 
       .add-novel {

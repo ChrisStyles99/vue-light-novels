@@ -16,11 +16,11 @@
 <script>
 import AddForm from '@/components/AddForm.vue'
 import NovelCard from '@/components/NovelCard.vue'
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import axios from 'axios'
 import Error from '@/components/Error.vue';
 import Loading from '@/components/Loading.vue';
+import { useStore } from 'vuex'
 
 export default {
   components: {
@@ -30,7 +30,7 @@ export default {
     Error
   },
   setup() {
-    const novel = ref({});
+    const store = useStore();
     const {
       params: { id },
     } = useRoute();
@@ -38,12 +38,13 @@ export default {
     const validImage = ref(true);
     const loading = ref(true);
     const error = ref(false);
+    const novel = computed(() => {
+      return store.getters.singleNovel;
+    });
 
     onMounted(async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/novel/${id}`);
-        const data = res.data;
-        novel.value = data[0];
+        store.dispatch('getSingleNovel', id);
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -74,8 +75,8 @@ export default {
         return validImage.value = false;
       }
 
-      await axios.put(`http://localhost:3000/edit/${id}`, novel.value);
-      router.push('/novels');
+      store.dispatch('editNovel', {updatedNovelData: novel.value, id: id});
+      router.push(`/novel/${id}`);
     };
 
     return {

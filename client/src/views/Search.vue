@@ -22,10 +22,10 @@
 
 <script>
 import { computed, ref } from 'vue';
-import axios from 'axios';
 import NovelCard from '@/components/NovelCard.vue';
 import Error from '@/components/Error.vue';
 import Loading from '@/components/Loading.vue';
+import { useStore } from 'vuex';
 
 export default {
   components: {
@@ -34,16 +34,17 @@ export default {
     Loading,
   },
   setup() {
-    const novels = ref([]);
+    const store = useStore();
+    const novels = computed(() => {
+      return store.state.novels;
+    });
     const loading = ref(true);
     const error = ref(false);
     const searchTerm = ref('');
 
     const getNovels = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/novels');
-        const data = res.data;
-        novels.value = data;
+        store.dispatch('getNovels');
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -73,6 +74,7 @@ export default {
 
 <style lang="scss" scoped>
 .search {
+  min-height: 100vh;
 
   .search-div {
     text-align: center;

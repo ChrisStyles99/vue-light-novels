@@ -3,6 +3,9 @@
     <h1 style="text-align: center">All novels</h1>
     <Loading v-if="loading" />
     <Error v-if="error" />
+    <h1 v-if="novels.length < 1">
+      Sorry, we have no novels to display :(
+    </h1>
     <div class="card-grid">
       <NovelCard
         v-for="novel in displayedNovels"
@@ -29,7 +32,8 @@
 
 <script>
 import { computed, ref, watch } from 'vue';
-import axios from 'axios';
+import {useStore} from 'vuex'
+// import axios from 'axios';
 import NovelCard from '@/components/NovelCard.vue';
 import Loading from '@/components/Loading.vue';
 import Error from '@/components/Error.vue';
@@ -41,24 +45,20 @@ export default {
     Error,
   },
   setup() {
-    const novels = ref([]);
+    const store = useStore();
+
+    const novels = computed(() => {
+      return store.getters.novels;
+    });
     const loading = ref(true);
     const error = ref(false);
     const page = ref(1);
     const perPage = ref(12);
     const pages = ref([]);
 
-    const getNovels = async () => {
-      try {
-        const res = await axios.get('http://localhost:3000/novels');
-        const data = res.data;
-        novels.value = data;
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        error.value = true;
-        loading.value = false;
-      }
+    const getNovels = () => {
+      store.dispatch('getNovels');
+      loading.value = false;
     };
 
     getNovels();
@@ -72,6 +72,7 @@ export default {
       let perPageNovels = perPage.value;
       let from = (pageNumber * perPageNovels) - perPageNovels;
       let to = pageNumber * perPageNovels;
+      if(newNovels.length < 1) return
       return newNovels.slice(from, to);
     };
 
@@ -85,8 +86,6 @@ export default {
     watch([pages, novels], () => {
       setNovels();
     })
-
-    // watchEffect([pages, novels], setNovels());
 
     return {
       novels,
@@ -103,6 +102,8 @@ export default {
 
 <style lang="scss" scoped>
 .novels {
+  min-height: 100vh;
+  
   .card-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);

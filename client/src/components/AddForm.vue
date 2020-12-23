@@ -8,8 +8,7 @@
           name="title"
           id="title"
           :value="novel.title"
-          @change="changeValue"
-          @keyup="changeValue"
+          @input="$emit('update:title', $event.target.value)"
           required
         />
       </div>
@@ -20,8 +19,7 @@
           name="author"
           id="author"
           :value="novel.author"
-          @change="changeValue"
-          @keyup="changeValue"
+          @input="$emit('update:author', $event.target.value)"
           required
         />
       </div>
@@ -32,7 +30,8 @@
           name="volumes"
           id="volumes"
           :value="novel.volumes"
-          @change="changeValue"
+          @input="$emit('update:volumes', $event.target.value)"
+          @change="$emit('update:volumes', $event.target.value)"
           required
           min="1"
         />
@@ -44,8 +43,7 @@
           name="imageUrl"
           id="image_url"
           :value="novel.image_url"
-          @change="changeValue"
-          @keyup="changeValue"
+          @input="$emit('update:image-url', $event.target.value)"
           required
         />
       </div>
@@ -58,8 +56,8 @@
 
 <script>
 export default {
-  props: ['novel', 'changeValue', 'text'],
-  emits: ['add-novel'],
+  props: ['novel', 'text'],
+  emits: ['add-novel', 'update:title', 'update:author', 'update:volumes', 'update:image-url'],
 
   setup(_, { emit }) {
     const addNovel = (e) => {

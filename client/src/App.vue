@@ -8,6 +8,10 @@
 <script>
 import Navbar from '@/components/Navbar.vue'
 
+if(window.document.cookie === '') {
+  window.localStorage.removeItem('isLoggedIn');
+}
+
 export default {
   components: {
     Navbar

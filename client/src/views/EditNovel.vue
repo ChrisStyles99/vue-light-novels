@@ -6,7 +6,8 @@
     <div class="edit-novel-grid">
       <div class="edit-form">
         <p v-if="!validImage">Please use a valid image url</p>
-        <AddForm :novel="novel" :changeValue="changeValue" @add-novel="editNovel" :text="'Update novel'"/>
+        <AddForm :novel="novel" v-model:title="novel.title" 
+        v-model:author="novel.author" v-model:volumes="novel.volumes" v-model:image-url="novel.image_url" @add-novel="editNovel" :text="'Update novel'"/>
       </div>
       <NovelCard :novel="novel"/>
     </div>
@@ -53,21 +54,6 @@ export default {
       }
     });
 
-    const changeValue = e => {
-      if(e.target.id === 'title') {
-        return novel.value.title = e.target.value;
-      }
-      if(e.target.id === 'author') {
-        return novel.value.author = e.target.value;
-      }
-      if(e.target.id === 'volumes') {
-        return novel.value.volumes = e.target.value;
-      }
-      if(e.target.id === 'image_url') {
-        return novel.value.image_url = e.target.value;
-      }
-    }
-
     const editNovel = async() => {
       const regex = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)/
       const validation = regex.test(novel.value.image_url);
@@ -81,7 +67,6 @@ export default {
 
     return {
       novel,
-      changeValue,
       editNovel,
       validImage,
       loading,

@@ -52,6 +52,7 @@ export default createStore({
     },
     logout(state) {
       state.isLoggedIn = false;
+      state.user = {};
     }
   },
   actions: {

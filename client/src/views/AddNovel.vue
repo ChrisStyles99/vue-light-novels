@@ -4,7 +4,8 @@
     <div class="add-novel-grid">
       <div class="add-form">
         <p v-if="!validImage">Add a valid Image url</p>
-        <AddForm :novel="novel" :changeValue="changeValue" @add-novel="addNovel" :text="'Add novel'"/>
+        <AddForm :novel="novel" v-model:title="novel.title" 
+        v-model:author="novel.author" v-model:volumes="novel.volumes" v-model:image-url="novel.image_url" @add-novel="addNovel" :text="'Add novel'"/>
       </div>
       <NovelCard :novel="novel"/>
     </div>
@@ -35,39 +36,18 @@ export default {
     const router = useRouter();
     const store = useStore();
 
-    const changeValue = e => {
-      if(e.target.id === 'title') {
-        return novel.value.title = e.target.value;
-      }
-      if(e.target.id === 'author') {
-        return novel.value.author = e.target.value;
-      }
-      if(e.target.id === 'volumes') {
-        return novel.value.volumes = e.target.value;
-      }
-      if(e.target.id === 'image_url') {
-        return novel.value.image_url = e.target.value;
-      }
-    }
-
     const addNovel = async() => {
       const regex = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/
       const validation = regex.test(novel.value.image_url);
-      console.log(novel.value.image_url);
       if(!validation) {
-        // novel.value.image_url = 'https://icon-library.com/images/no-picture-available-icon/no-picture-available-icon-1.jpg'
         return validImage.value = false;
       }
-
       await store.dispatch('postNewNovel', novel.value);
-
-      // await Axios.post('http://localhost:3000/new-novel', novel.value);
       router.push('/novels');
     };
 
     return {
       novel,
-      changeValue,
       addNovel,
       validImage
     }
